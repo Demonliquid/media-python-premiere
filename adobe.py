@@ -31,7 +31,7 @@ STEPS:
 
 
 TODO:
-
+- CAMBIAR LISTA DE VIDEOS POR NOMBRE
 - PONER LINK DE DESCARGA Y QUE PIDA DIRECTAMENTE LOS TIEMPOS DE CORTE (SIEMPRE 480p)
 - AGREGAR EFECTO CROP: CROP TOP, BOTTOM, LEFT, RIGHT
 - NO SOLO BACKGROUND.PNG SINO QUE CUALQUIER OTRA IMAGEN
@@ -45,6 +45,7 @@ TODO:
 
 # %% FUNCIONES
 def descargarvideo(youtubeurl, savepath):
+    '''It downloads a video from youtube in 480p and solid background'''
     yt = YouTube(youtubeurl)
     stream = yt.streams.filter(res='480p').first()
     stream.download(savepath)
@@ -56,6 +57,7 @@ def descargarvideo(youtubeurl, savepath):
 
 
 def setup(adobe_exe):
+    '''Opens Adobe'''
     # ABRIR ADOBE
     process = "Adobe Premiere Pro.exe"
     if not process in (i.name() for i in psutil.process_iter()):
@@ -67,6 +69,7 @@ def setup(adobe_exe):
 
 
 def abrirproyecto(template_file):
+    '''Open template project, it tries a couple of times because of Adobe slow execution'''
     attempts = 0
     while attempts < 10:
         time.sleep(1)
@@ -78,6 +81,7 @@ def abrirproyecto(template_file):
 
 
 def importvideo(media_path):
+    '''Imports folder from descargarvideo() '''
     project = pymiere.objects.app.project
     media_path = media_path
 
@@ -94,17 +98,20 @@ def importvideo(media_path):
 
 
 def listarvideos(items):
+    '''Adobe uses an index to use videos, at least for now'''
     for i in range(len(items)):
         print(f"Nombre del video {i}:", items[i].name)
 
 
 def addVideo(clip,seq,inP,ouP, track):
+    '''Video to sequence'''
     clip.setInPoint(inP, 4)
     clip.setOutPoint(ouP, 4)
     seq.videoTracks[track].insertClip(clip,0)
 
 
 def agregarvideo(background, clip, whiteclip, seq, inP, ouP):
+    '''Custom addVideo, it adds two videos: main and backgruond'''
     addVideo(clip, seq, inP, ouP, track=1) # PRINCIPAL
     if background == 0:
         return
@@ -115,6 +122,7 @@ def agregarvideo(background, clip, whiteclip, seq, inP, ouP):
 
 
 def agregarblur(clip):
+    '''Adds blur effect to background and sets scale effect'''
     qe_project = pymiere.objects.qe.project
     track = qe_project.getActiveSequence().getVideoTrackAt(0)
 
@@ -151,6 +159,7 @@ def agregarblur(clip):
 
 
 def corregirescala(clip):
+    '''Scale effect for main video'''
     qe_project = pymiere.objects.qe.project
     track = qe_project.getActiveSequence().getVideoTrackAt(1)
 
